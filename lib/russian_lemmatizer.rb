@@ -9,10 +9,10 @@ class RussianLemmatizer
   #
   # @param dictionary_path [String] Path to your dictionary
   # @param redis [Object] Redis instance
-  def initialize(dictionary_path = './data/dict.opcorpora.txt', redis = nil)
+  def initialize(dictionary_path: './data/dict.opcorpora.txt', redis_config: nil)
     @dictionary_path = dictionary_path
 
-    @redis = redis || Redis.new
+    @redis = redis_config.nil? ? Redis.new : Redis.new(redis_config)
 
     @dictionary_key = 'lemmas_dictionary'
 
@@ -24,9 +24,12 @@ class RussianLemmatizer
   def load_data_to_redis
     is_new_lemma = true
     current_lemma = ''
+    verbs = []
 
     File.foreach(@dictionary_path) do |line|
       word = line.split("\t")[0]
+      word.gsub!('Ё', 'Е')
+      word_info = line.split("\t")[1]
 
       if word.match?(/[0-9]/) || word == "\n"
         is_new_lemma = true
@@ -38,7 +41,16 @@ class RussianLemmatizer
         is_new_lemma = false
       end
 
-      @redis.hmset(@dictionary_key, word, current_lemma)
+      if word_info.include?('VERB')
+        verbs << word
+      elsif word_info.include?('INFN')
+        verbs.each do |verb|
+          @redis.hmset(@dictionary_key, verb, word)
+        end
+        verbs = []
+      else
+        @redis.hmset(@dictionary_key, word, current_lemma)
+      end
     end
   end
 
@@ -47,7 +59,7 @@ class RussianLemmatizer
   # @param word [String] Word which you want to find lemma for
   # return [String] Lemma for this word
   def get_lemma(word_form)
-    word_form = word_form.upcase
+    word_form = word_form.upcase.gsub!('Ё', 'Е')
 
     @redis.hget(@dictionary_key, word_form) || word_form
   end
@@ -58,11 +70,12 @@ class RussianLemmatizer
   # return [String] Array of words without any symbols
   def tokenize(word_form)
     word_form = word_form.split if word_form.is_a? String
+    word_form.map! { |word| word.upcase.gsub!('Ё', 'Е') }
 
     tokenized = []
     word_form.each do |word|
       word = word.upcase
-      tokenized << word.scan(/[А-Я|Ё]+/)[0] if word.match?(/[А-Я|Ё]+/)
+      tokenized << word.scan(/[А-Я]+/)[0] if word.match?(/[А-Я|Ё]+/)
     end
 
     tokenized
@@ -78,9 +91,8 @@ class RussianLemmatizer
     word_form.map { |word| get_lemma(word) }
   end
 
-  # Clear Redis storage
+  # Clear Redis storage dictionary key
   #
-
   def clear_storage
     @redis.del(@dictionary_key)
   end
