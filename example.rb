@@ -2,7 +2,7 @@
 
 require 'russian_lemmatizer'
 
-# Set up Redis config
+# Set up Redis config (not necessary if used default)
 redis_config = {
   host: '127.0.0.1',
   port: 6379
