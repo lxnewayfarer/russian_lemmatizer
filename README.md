@@ -54,5 +54,16 @@ lemmatizer = RussianLemmatizer.new(dictionary_path: "./data/dict.opcorpora.txt")
 Rspec тестами покрыты методы `get_lemma`, `tokenize` и `lemmatize`. Глаголы, существительные и прилагательные отрабатывают корректно в любой форме.
 Для запуска тестов запустить
 ```
-rspec
+% rspec
+```
+
+Для локальной установки гема, использовать:
+```
+% gem install ./hola-0.0.0.gem
+```
+После чего, гем будет доступен локально:
+```
+% irb
+>> require 'russian_lemmatizer'
+=> true
 ```
