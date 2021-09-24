@@ -76,7 +76,7 @@ class RussianLemmatizer
     tokenized = []
     word_form.each do |word|
       word = word.upcase
-      tokenized << word.scan(/[А-Я]+/)[0] if word.match?(/[А-Я|Ё]+/)
+      tokenized << word.scan(/[А-Я]+/)[0] if word.match?(/[А-Я]+/)
     end
 
     tokenized
