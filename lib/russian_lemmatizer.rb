@@ -59,7 +59,7 @@ class RussianLemmatizer
   # @param word [String] Word which you want to find lemma for
   # return [String] Lemma for this word
   def get_lemma(word_form)
-    word_form = word_form.upcase.gsub!('Ё', 'Е')
+    word_form = word_form.upcase.gsub('Ё', 'Е')
 
     @redis.hget(@dictionary_key, word_form) || word_form
   end
@@ -70,7 +70,8 @@ class RussianLemmatizer
   # return [String] Array of words without any symbols
   def tokenize(word_form)
     word_form = word_form.split if word_form.is_a? String
-    word_form.map! { |word| word.upcase.gsub!('Ё', 'Е') }
+
+    word_form.map! { |word| word.upcase.gsub('Ё', 'Е') }
 
     tokenized = []
     word_form.each do |word|
