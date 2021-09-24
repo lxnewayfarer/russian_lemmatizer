@@ -57,6 +57,14 @@ Rspec тестами покрыты методы `get_lemma`, `tokenize` и `lem
 % rspec
 ```
 
+Для сборки гема локально:
+```
+% gem build russian_lemmatizer.gemspec 
+Successfully built RubyGem
+Name: russian_lemmatizer
+Version: 0.1.0
+File: russian_lemmatizer-0.1.0.gem
+```
 Для локальной установки гема, использовать:
 ```
 % gem install ./hola-0.0.0.gem
