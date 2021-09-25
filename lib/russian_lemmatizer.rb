@@ -5,10 +5,10 @@ require 'redis'
 # Russian lemmatizer. Transforming russian text to lemmas
 #
 class RussianLemmatizer
-  # Initialize
+  # Initialize and loads data to redis if not loaded
   #
   # @param dictionary_path [String] Path to your dictionary
-  # @param redis [Object] Redis instance
+  # @param redis [Hash] Redis config
   def initialize(dictionary_path: './data/dict.opcorpora.txt', redis_config: nil)
     @dictionary_path = dictionary_path
 
@@ -92,7 +92,7 @@ class RussianLemmatizer
     word_form.map { |word| get_lemma(word) }
   end
 
-  # Clear Redis storage dictionary key
+  # Clears Redis storage dictionary key
   #
   def clear_storage
     @redis.del(@dictionary_key)
